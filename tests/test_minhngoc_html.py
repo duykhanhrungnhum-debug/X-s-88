@@ -29,16 +29,25 @@ MN_FIXTURE = """
 """
 
 
-def test_build_region_url():
+def test_build_region_url_uses_verified_daily_page():
     assert build_region_url("mien-nam", date(2026, 9, 15)) == (
-        "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-nam/15-09-2026.html"
+        "https://www.minhngoc.net.vn/ket-qua-xo-so/15-09-2026.html"
     )
 
 
 def test_parse_mien_bac_preserves_leading_zeroes():
     rows = parse_html(MB_FIXTURE, "mien-bac")
     assert any(row.prize == "Giải nhì" and row.numbers == ("01234", "56789") for row in rows)
+    assert any(row.prize == "Giải tám" and row.numbers == ("99",) for row in rows)
     assert any(row.prize == "Giải Đặc Biệt" and row.numbers == ("12345",) for row in rows)
+
+
+def test_parse_mien_bac_maps_all_prizes():
+    rows = parse_html(MB_FIXTURE, "mien-bac")
+    assert [row.prize for row in rows] == [
+        "Giải tám", "Giải bảy", "Giải sáu", "Giải năm", "Giải tư",
+        "Giải ba", "Giải nhì", "Giải nhất", "Giải Đặc Biệt",
+    ]
 
 
 def test_parse_mien_nam_extracts_province_and_numbers():
