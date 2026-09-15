@@ -1,0 +1,50 @@
+name: Minh Ngoc live smoke
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Fetch one public daily result page
+        run: |
+          python - <<'PY'
+          from scraper.sources.minhngoc_html import build_region_url, fetch_html, parse_html
+          from datetime import date
+
+          # One request only. This is a connectivity/shape smoke test, not data ingestion.
+          url = build_region_url("mien-bac", date(2026, 9, 15))
+          print(f"URL={url}")
+          try:
+              response = fetch_html(url)
+          except Exception as exc:
+              print(f"FETCH_ERROR={type(exc).__name__}: {exc}")
+              raise
+
+          print(f"HTTP_STATUS={response.status_code}")
+          print(f"CONTENT_BYTES={len(response.content)}")
+          print(f"CONTENT_SHA256={response.content_hash}")
+
+          lowered = response.content.lower()
+          markers = [b"bkqmienbac", b"bkqtinhmienbac", "giải đặc biệt".encode("utf-8")]
+          present = [marker.decode("utf-8", "ignore") for marker in markers if marker in lowered]
+          print(f"RESULT_MARKERS={present}")
+          if response.status_code != 200:
+              raise SystemExit("Unexpected HTTP status")
+          if not present:
+              raise SystemExit("HTTP 200 but expected result markers were not found")
+
+          rows = parse_html(response.content, "mien-bac")
+          print(f"PARSED_ROWS={len(rows)}")
+          if not rows:
+              raise SystemExit("HTTP 200 but parser extracted zero MB rows")
+          print("LIVE_SMOKE=PASS")
+          PY
