@@ -1,0 +1,2 @@
+supabase>=2.18,<3
+pytest>=8,<9
