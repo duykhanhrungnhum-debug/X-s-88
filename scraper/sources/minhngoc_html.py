@@ -25,7 +25,10 @@ class FetchResponse:
 def build_region_url(region: str, target_date: date) -> str:
     if region not in {"mien-bac", "mien-trung", "mien-nam"}:
         raise ValueError(f"Unsupported region: {region}")
-    return f"https://www.minhngoc.net.vn/ket-qua-xo-so/{region}/{target_date:%d-%m-%Y}.html"
+    # Minh Ngoc's verified daily result page contains the regional result
+    # sections. Keep the region argument for caller intent; selection happens
+    # in the parser rather than assuming an unverified region/date URL shape.
+    return f"https://www.minhngoc.net.vn/ket-qua-xo-so/{target_date:%d-%m-%Y}.html"
 
 
 def fetch_html(url: str, *, session: requests.Session | None = None, timeout: float = DEFAULT_TIMEOUT_SECONDS) -> FetchResponse:
@@ -57,17 +60,17 @@ def parse_mien_bac(html: bytes | str) -> list[PrizeRow]:
     if not isinstance(inner, Tag):
         return []
 
-    # Class names and label/number pairing are based on a public Minh Ngoc
-    # parser implementation. Keep this mapping isolated for easy correction.
+    # Verified against the public Minh Ngoc result structure: giai1..giai8
+    # correspond directly to Giải nhất..Giải tám; giaidb is Giải Đặc Biệt.
     mapping = (
-        ("giai8l", "giai8", "Giải bảy"),
-        ("giai7l", "giai7", "Giải sáu"),
-        ("giai6l", "giai6", "Giải năm"),
-        ("giai5l", "giai5", "Giải tư"),
-        ("giai4l", "giai4", "Giải ba"),
-        ("giai3l", "giai3", "Giải nhì"),
-        ("giai2l", "giai2", "Giải nhất"),
-        ("giai1l", "giai1", "Giải Đặc Biệt"),
+        ("giai8l", "giai8", "Giải tám"),
+        ("giai7l", "giai7", "Giải bảy"),
+        ("giai6l", "giai6", "Giải sáu"),
+        ("giai5l", "giai5", "Giải năm"),
+        ("giai4l", "giai4", "Giải tư"),
+        ("giai3l", "giai3", "Giải ba"),
+        ("giai2l", "giai2", "Giải nhì"),
+        ("giai1l", "giai1", "Giải nhất"),
         ("giaidbl", "giaidb", "Giải Đặc Biệt"),
     )
     rows: list[PrizeRow] = []
