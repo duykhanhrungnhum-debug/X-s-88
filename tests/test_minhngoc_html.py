@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from scraper.sources.minhngoc_html import build_region_url, parse_html
+from scraper.sources.minhngoc_html import HostRateLimiter, build_region_url, parse_html
 
 
 MB_FIXTURE = """
@@ -54,6 +54,42 @@ def test_parse_mien_nam_extracts_province_and_numbers():
     rows = parse_html(MN_FIXTURE, "mien-nam")
     assert any(row.province == "Tây Ninh" and row.prize == "Giải tám" and row.numbers == ("09",) for row in rows)
     assert any(row.prize == "Giải Đặc Biệt" and row.numbers == ("012345",) for row in rows)
+
+
+def test_rate_limiter_enforces_five_seconds_per_host():
+    clock = [100.0]
+    sleeps: list[float] = []
+
+    def monotonic() -> float:
+        return clock[0]
+
+    def sleeper(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock[0] += seconds
+
+    limiter = HostRateLimiter(interval_seconds=5.0, monotonic=monotonic, sleeper=sleeper)
+    url = "https://www.minhngoc.net.vn/ket-qua-xo-so/15-09-2026.html"
+    limiter.wait(url)
+    clock[0] += 1.0
+    limiter.wait(url)
+    assert sleeps == [4.0]
+
+
+def test_rate_limiter_is_independent_per_host():
+    clock = [100.0]
+    sleeps: list[float] = []
+
+    def monotonic() -> float:
+        return clock[0]
+
+    def sleeper(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock[0] += seconds
+
+    limiter = HostRateLimiter(interval_seconds=5.0, monotonic=monotonic, sleeper=sleeper)
+    limiter.wait("https://www.minhngoc.net.vn/a")
+    limiter.wait("https://example.com/b")
+    assert sleeps == []
 
 
 def test_unknown_region_rejected():
