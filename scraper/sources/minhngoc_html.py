@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from datetime import date
+from threading import Lock
+from typing import Callable
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -22,6 +26,29 @@ class FetchResponse:
     content_hash: str
 
 
+@dataclass
+class HostRateLimiter:
+    """Serialize requests per host and enforce a minimum interval."""
+
+    interval_seconds: float = MIN_REQUEST_INTERVAL_SECONDS
+    monotonic: Callable[[], float] = time.monotonic
+    sleeper: Callable[[float], None] = time.sleep
+    _last_request_at: dict[str, float] = field(default_factory=dict, init=False)
+    _lock: Lock = field(default_factory=Lock, init=False)
+
+    def wait(self, url: str) -> None:
+        host = urlparse(url).netloc.lower()
+        with self._lock:
+            now = self.monotonic()
+            last = self._last_request_at.get(host)
+            if last is not None:
+                remaining = self.interval_seconds - (now - last)
+                if remaining > 0:
+                    self.sleeper(remaining)
+                    now = self.monotonic()
+            self._last_request_at[host] = now
+
+
 def build_region_url(region: str, target_date: date) -> str:
     if region not in {"mien-bac", "mien-trung", "mien-nam"}:
         raise ValueError(f"Unsupported region: {region}")
@@ -31,9 +58,21 @@ def build_region_url(region: str, target_date: date) -> str:
     return f"https://www.minhngoc.net.vn/ket-qua-xo-so/{target_date:%d-%m-%Y}.html"
 
 
-def fetch_html(url: str, *, session: requests.Session | None = None, timeout: float = DEFAULT_TIMEOUT_SECONDS) -> FetchResponse:
+def fetch_html(
+    url: str,
+    *,
+    session: requests.Session | None = None,
+    timeout: float = DEFAULT_TIMEOUT_SECONDS,
+    rate_limiter: HostRateLimiter | None = None,
+) -> FetchResponse:
+    limiter = rate_limiter or HostRateLimiter()
+    limiter.wait(url)
     client = session or requests.Session()
-    response = client.get(url, timeout=timeout, headers={"User-Agent": DEFAULT_USER_AGENT, "Accept": "text/html"})
+    response = client.get(
+        url,
+        timeout=timeout,
+        headers={"User-Agent": DEFAULT_USER_AGENT, "Accept": "text/html"},
+    )
     response.raise_for_status()
     content = response.content
     return FetchResponse(url, response.status_code, content, hashlib.sha256(content).hexdigest())
