@@ -1,0 +1,42 @@
+name: Collect Xoso88 results
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Draw date (YYYY-MM-DD); leave empty for today"
+        required: false
+        type: string
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [mien-bac, mien-trung, mien-nam]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Collect ${{ matrix.region }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "Required repository secrets SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not configured."
+            exit 1
+          fi
+          if [ -n "${{ inputs.date }}" ]; then
+            python -m scraper.collect_live --region "${{ matrix.region }}" --date "${{ inputs.date }}"
+          else
+            python -m scraper.collect_live --region "${{ matrix.region }}"
+          fi
