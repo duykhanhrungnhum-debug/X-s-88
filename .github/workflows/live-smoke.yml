@@ -1,8 +1,6 @@
 name: Minh Ngoc live smoke
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
