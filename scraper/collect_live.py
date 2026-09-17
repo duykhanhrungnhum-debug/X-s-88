@@ -7,7 +7,12 @@ import unicodedata
 
 from .models import LotteryResult
 from .pipeline import publish_validated_result, validate_result
-from .sources.minhngoc_html import build_region_url, fetch_html, parse_html
+from .sources.minhngoc_html import (
+    build_region_url,
+    extract_region_result_date,
+    fetch_html,
+    parse_html,
+)
 from .supabase_store import SupabaseStore
 
 
@@ -54,9 +59,17 @@ def collect(region: str, target_date: date) -> list[str]:
         status="fetched",
         content_hash=response.content_hash,
     )
+
+    actual_date = extract_region_result_date(response.content, region)
+    if actual_date != target_date:
+        raise RuntimeError(
+            f"Minh Ngoc returned {region} results for {actual_date.isoformat() if actual_date else 'an unknown date'}, "
+            f"but collector requested {target_date.isoformat()}; refusing to publish mismatched data"
+        )
+
     rows = parse_html(response.content, region)
     if not rows:
-        raise RuntimeError(f"No {region} result rows found at {url}")
+        raise RuntimeError(f"No {region} result rows found for {target_date.isoformat()} at {url}")
 
     by_province: dict[str, dict[str, list[str]]] = {}
     for row in rows:
