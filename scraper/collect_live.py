@@ -23,6 +23,10 @@ SOURCE_TO_DB_REGION = {
 }
 
 
+class SourceDateMismatchError(RuntimeError):
+    """The requested day's source page exists but is not published yet."""
+
+
 def province_code(name: str) -> str:
     """Create a stable ASCII province key from the source display name."""
     normalized = unicodedata.normalize("NFKD", name.strip())
@@ -62,7 +66,7 @@ def collect(region: str, target_date: date) -> list[str]:
 
     actual_date = extract_region_result_date(response.content, region)
     if actual_date != target_date:
-        raise RuntimeError(
+        raise SourceDateMismatchError(
             f"Minh Ngoc returned {region} results for {actual_date.isoformat() if actual_date else 'an unknown date'}, "
             f"but collector requested {target_date.isoformat()}; refusing to publish mismatched data"
         )
@@ -99,9 +103,21 @@ def collect(region: str, target_date: date) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--region", choices=["mien-bac", "mien-trung", "mien-nam"], required=True)
-    parser.add_argument("--date", default=date.today().isoformat())
+    parser.add_argument(
+        "--date",
+        help="Exact source date to collect. Omit for scheduled mode, which waits for today's published results.",
+    )
     args = parser.parse_args()
-    ids = collect(args.region, date.fromisoformat(args.date))
+    target_date = date.fromisoformat(args.date) if args.date else date.today()
+
+    try:
+        ids = collect(args.region, target_date)
+    except SourceDateMismatchError as exc:
+        if not args.date:
+            print(f"No {args.region} results published for {target_date.isoformat()} yet; waiting for the next scheduled run.")
+            return
+        raise exc
+
     print(f"published {len(ids)} draw(s): {', '.join(ids)}")
 
 
