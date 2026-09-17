@@ -26,6 +26,39 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      - name: Validate Supabase REST endpoint
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from urllib.parse import urlparse
+          import requests
+
+          url = os.environ["SUPABASE_URL"].strip()
+          parsed = urlparse(url)
+          print(f"Supabase scheme={parsed.scheme!r} host={parsed.netloc!r} path={parsed.path!r}")
+          assert parsed.scheme == "https", "SUPABASE_URL must use https"
+          assert parsed.netloc == "mwdlwvychuolybbfvyem.supabase.co", "SUPABASE_URL host is unexpected"
+          assert parsed.path in ("", "/"), "SUPABASE_URL must not contain an API path"
+          endpoint = url.rstrip("/") + "/rest/v1/source_fetches?select=id&limit=1"
+          response = requests.get(
+              endpoint,
+              headers={
+                  "apikey": os.environ["SUPABASE_SERVICE_ROLE_KEY"],
+                  "Authorization": "Bearer " + os.environ["SUPABASE_SERVICE_ROLE_KEY"],
+                  "Accept": "application/json",
+              },
+              timeout=15,
+          )
+          print(f"Supabase REST probe HTTP status={response.status_code}")
+          if response.status_code >= 400:
+              print("Supabase REST probe failed; response body is intentionally omitted to avoid leaking data.")
+              raise SystemExit(1)
+          print("Supabase REST probe succeeded.")
+          PY
       - name: Collect regions sequentially
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
