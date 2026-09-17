@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - name: Diagnose Supabase key type
+      - name: Diagnose Supabase credential
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
@@ -47,20 +47,24 @@ jobs:
           if not key:
               raise SystemExit("SUPABASE_SERVICE_ROLE_KEY is empty")
 
-          # Never print the key itself. Only classify its safe public shape and,
-          # for legacy JWTs, print the non-secret role claim from the payload.
           parts = key.split(".")
           if len(parts) == 3 and parts[0].startswith("eyJ"):
-              payload = parts[1] + "=" * (-len(parts[1]) % 4)
-              claims = json.loads(base64.urlsafe_b64decode(payload).decode("utf-8"))
-              print(f"Supabase key format=legacy-jwt role={claims.get('role', '<missing>')!r}")
-              print(f"Supabase key issuer={claims.get('iss', '<missing>')!r}")
+              try:
+                  payload = parts[1] + "=" * (-len(parts[1]) % 4)
+                  claims = json.loads(base64.urlsafe_b64decode(payload).decode("utf-8"))
+              except Exception as exc:
+                  raise SystemExit(f"Supabase credential looks like a JWT but payload decoding failed: {type(exc).__name__}")
+              role = claims.get("role")
+              issuer = claims.get("iss")
+              print(f"Supabase credential format=legacy-jwt role={role!r} issuer={issuer!r}")
+              if role != "service_role":
+                  raise SystemExit("SUPABASE_SERVICE_ROLE_KEY is not a legacy service_role JWT")
           elif key.startswith("sb_secret_"):
-              print("Supabase key format=modern-secret-key")
+              print("Supabase credential format=modern-secret-key")
           elif key.startswith("sb_publishable_"):
-              print("Supabase key format=modern-publishable-key")
+              raise SystemExit("SUPABASE_SERVICE_ROLE_KEY contains a publishable key, not a server-side secret")
           else:
-              print("Supabase key format=unknown")
+              raise SystemExit("SUPABASE_SERVICE_ROLE_KEY has an unknown key format")
           PY
       - name: Validate Supabase REST endpoint
         env:
