@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date
 
 from scraper import collect_live
 from scraper.sources.minhngoc import PrizeRow
@@ -15,7 +15,7 @@ class FakeStore:
         return "fetch-1"
 
 
-def test_collect_uses_prize_field_and_publishes_validated_rows(monkeypatch):
+def test_collect_maps_source_region_to_database_enum(monkeypatch):
     store = FakeStore()
     response = FetchResponse(
         url="https://www.minhngoc.net.vn/ket-qua-xo-so/15-09-2026.html",
@@ -45,4 +45,13 @@ def test_collect_uses_prize_field_and_publishes_validated_rows(monkeypatch):
     result, kwargs = store.publish_calls[0]
     assert result.province == "Tây Ninh"
     assert result.prizes == {"Giải tám": ["09"], "Giải Đặc Biệt": ["012345"]}
+    assert kwargs["region"] == "south"
     assert kwargs["source_fetch_id"] == "fetch-1"
+
+
+def test_all_source_regions_have_database_enum_mapping():
+    assert collect_live.SOURCE_TO_DB_REGION == {
+        "mien-bac": "north",
+        "mien-trung": "central",
+        "mien-nam": "south",
+    }
