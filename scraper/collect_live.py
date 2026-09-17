@@ -49,7 +49,7 @@ def collect(region: str, target_date: date) -> list[str]:
 
     by_province: dict[str, dict[str, list[str]]] = {}
     for row in rows:
-        by_province.setdefault(row.province, {}).setdefault(row.prize_name, []).extend(row.numbers)
+        by_province.setdefault(row.province, {}).setdefault(row.prize, []).extend(row.numbers)
 
     published: list[str] = []
     for province, prizes in by_province.items():
