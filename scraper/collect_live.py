@@ -3,11 +3,19 @@ from __future__ import annotations
 
 import argparse
 from datetime import date, datetime, timezone
+import unicodedata
 
 from .models import LotteryResult
 from .pipeline import publish_validated_result, validate_result
 from .sources.minhngoc_html import build_region_url, fetch_html, parse_html
 from .supabase_store import SupabaseStore
+
+
+def province_code(name: str) -> str:
+    """Create a stable ASCII province key from the source display name."""
+    normalized = unicodedata.normalize("NFKD", name.strip())
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii").lower()
+    return "-".join(ascii_name.split())
 
 
 def collect(region: str, target_date: date) -> list[str]:
@@ -22,7 +30,7 @@ def collect(region: str, target_date: date) -> list[str]:
             source_url=url,
             fetched_at=fetched_at,
             http_status=None,
-            status="error",
+            status="failed",
             error_message=str(exc),
         )
         raise
@@ -53,11 +61,10 @@ def collect(region: str, target_date: date) -> list[str]:
             fetched_at=fetched_at,
         )
         validated = validate_result(result)
-        code = province.lower().replace(" ", "-")
         draw_id = publish_validated_result(
             store,
             validated,
-            province_code=code,
+            province_code=province_code(province),
             region=region,
             source_fetch_id=fetch_id,
         )
