@@ -8,11 +8,33 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 from supabase import Client, create_client
 
 from .models import LotteryResult
 from .sources.minhngoc import PRIZE_ORDER
+
+
+def normalize_supabase_url(url: str) -> str:
+    """Return the project URL accepted by supabase-py.
+
+    GitHub secrets in the wild are sometimes configured as the REST endpoint
+    (``.../rest/v1/``) instead of the project root. Accept that documented
+    deployment mistake explicitly, but reject arbitrary paths so a malformed
+    secret cannot silently produce another invalid API URL.
+    """
+    parsed = urlsplit(url.strip())
+    path = parsed.path.rstrip("/")
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise RuntimeError("SUPABASE_URL must be an https project URL")
+    if parsed.query or parsed.fragment:
+        raise RuntimeError("SUPABASE_URL must not contain a query or fragment")
+    if path not in ("", "/rest/v1"):
+        raise RuntimeError(
+            "SUPABASE_URL must be the project URL, optionally ending with /rest/v1"
+        )
+    return urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
 
 
 class SupabaseStore:
@@ -29,7 +51,7 @@ class SupabaseStore:
             raise RuntimeError(
                 "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required"
             )
-        return cls(create_client(url, key))
+        return cls(create_client(normalize_supabase_url(url), key))
 
     def record_fetch(
         self,
