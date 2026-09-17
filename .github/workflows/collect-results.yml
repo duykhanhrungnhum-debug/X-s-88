@@ -12,7 +12,7 @@ on:
       date:
         description: "Draw date (YYYY-MM-DD); leave empty for today"
         required: false
-        default: "2026-09-15"
+        default: ""
         type: string
   schedule:
     - cron: "*/10 * * * *"
