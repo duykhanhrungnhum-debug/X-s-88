@@ -212,3 +212,8 @@ class SupabaseStore:
             prefer="return=minimal",
         )
         return draw_id
+
+
+def normalize_supabase_url(url: str) -> str:
+    """Backward-compatible module-level wrapper for URL normalization."""
+    return SupabaseStore.normalize_supabase_url(url)
