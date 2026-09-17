@@ -11,6 +11,13 @@ from .sources.minhngoc_html import build_region_url, fetch_html, parse_html
 from .supabase_store import SupabaseStore
 
 
+SOURCE_TO_DB_REGION = {
+    "mien-bac": "north",
+    "mien-trung": "central",
+    "mien-nam": "south",
+}
+
+
 def province_code(name: str) -> str:
     """Create a stable ASCII province key from the source display name."""
     normalized = unicodedata.normalize("NFKD", name.strip())
@@ -19,6 +26,10 @@ def province_code(name: str) -> str:
 
 
 def collect(region: str, target_date: date) -> list[str]:
+    if region not in SOURCE_TO_DB_REGION:
+        raise ValueError(f"Unsupported collector region: {region}")
+
+    db_region = SOURCE_TO_DB_REGION[region]
     url = build_region_url(region, target_date)
     fetched_at = datetime.now(timezone.utc)
     store = SupabaseStore.from_env()
@@ -65,7 +76,7 @@ def collect(region: str, target_date: date) -> list[str]:
             store,
             validated,
             province_code=province_code(province),
-            region=region,
+            region=db_region,
             source_fetch_id=fetch_id,
         )
         published.append(draw_id)
