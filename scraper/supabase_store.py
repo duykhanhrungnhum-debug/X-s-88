@@ -119,9 +119,15 @@ class SupabaseStore:
         existing = self._request(
             "GET",
             "lottery_provinces",
-            params={"select": "id", "code": f"eq.{code}", "limit": "1"},
+            params={"select": "id,name,region", "code": f"eq.{code}", "limit": "1"},
         )
         if existing:
+            existing_region = existing[0].get("region")
+            if existing_region != region:
+                raise RuntimeError(
+                    f"Province code {code!r} is already mapped to region {existing_region!r}, "
+                    f"but collector requested {region!r}; refusing to mix regions"
+                )
             return str(existing[0]["id"])
 
         rows = self._request(
