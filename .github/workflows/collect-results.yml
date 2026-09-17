@@ -12,6 +12,7 @@ on:
       date:
         description: "Draw date (YYYY-MM-DD); leave empty for today"
         required: false
+        default: "2026-09-15"
         type: string
   schedule:
     - cron: "*/10 * * * *"
@@ -32,6 +33,35 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      - name: Diagnose Supabase key type
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import json
+          import os
+
+          key = os.environ["SUPABASE_SERVICE_ROLE_KEY"].strip()
+          if not key:
+              raise SystemExit("SUPABASE_SERVICE_ROLE_KEY is empty")
+
+          # Never print the key itself. Only classify its safe public shape and,
+          # for legacy JWTs, print the non-secret role claim from the payload.
+          parts = key.split(".")
+          if len(parts) == 3 and parts[0].startswith("eyJ"):
+              payload = parts[1] + "=" * (-len(parts[1]) % 4)
+              claims = json.loads(base64.urlsafe_b64decode(payload).decode("utf-8"))
+              print(f"Supabase key format=legacy-jwt role={claims.get('role', '<missing>')!r}")
+              print(f"Supabase key issuer={claims.get('iss', '<missing>')!r}")
+          elif key.startswith("sb_secret_"):
+              print("Supabase key format=modern-secret-key")
+          elif key.startswith("sb_publishable_"):
+              print("Supabase key format=modern-publishable-key")
+          else:
+              print("Supabase key format=unknown")
+          PY
       - name: Validate Supabase REST endpoint
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
