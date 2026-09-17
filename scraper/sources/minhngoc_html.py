@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import time
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from threading import Lock
 from typing import Callable
 from urllib.parse import urlparse
@@ -16,6 +17,11 @@ from scraper.sources.minhngoc import PrizeRow, normalize_number
 DEFAULT_TIMEOUT_SECONDS = 15
 DEFAULT_USER_AGENT = "Xoso88/0.1 (+respectful public-results collector)"
 MIN_REQUEST_INTERVAL_SECONDS = 5.0
+SOURCE_REGION_NAMES = {
+    "mien-bac": "Bắc",
+    "mien-trung": "Trung",
+    "mien-nam": "Nam",
+}
 
 
 @dataclass(frozen=True)
@@ -50,12 +56,12 @@ class HostRateLimiter:
 
 
 def build_region_url(region: str, target_date: date) -> str:
-    if region not in {"mien-bac", "mien-trung", "mien-nam"}:
+    """Build the verified region-specific Minh Ngoc daily result URL."""
+    if region not in SOURCE_REGION_NAMES:
         raise ValueError(f"Unsupported region: {region}")
-    # Minh Ngoc's verified daily result page contains the regional result
-    # sections. Keep the region argument for caller intent; selection happens
-    # in the parser rather than assuming an unverified region/date URL shape.
-    return f"https://www.minhngoc.net.vn/ket-qua-xo-so/{target_date:%d-%m-%Y}.html"
+    return (
+        f"https://www.minhngoc.net.vn/ket-qua-xo-so/{region}/{target_date:%d-%m-%Y}.html"
+    )
 
 
 def fetch_html(
@@ -76,6 +82,23 @@ def fetch_html(
     response.raise_for_status()
     content = response.content
     return FetchResponse(url, response.status_code, content, hashlib.sha256(content).hexdigest())
+
+
+def extract_region_result_date(html: bytes | str, region: str) -> date | None:
+    """Extract the date attached to the requested region result section."""
+    if region not in SOURCE_REGION_NAMES:
+        raise ValueError(f"Unsupported region: {region}")
+    soup = BeautifulSoup(html, "html.parser")
+    text = " ".join(soup.get_text(" ", strip=True).split())
+    region_name = SOURCE_REGION_NAMES[region]
+    pattern = re.compile(
+        rf"KẾT QUẢ\s+XỔ\s+SỐ\s+Miền\s+{re.escape(region_name)}\s*-\s*(\d{{2}}/\d{{2}}/\d{{4}})",
+        re.IGNORECASE,
+    )
+    match = pattern.search(text)
+    if not match:
+        return None
+    return datetime.strptime(match.group(1), "%d/%m/%Y").date()
 
 
 def _cell_numbers(cell: Tag) -> list[str]:
@@ -99,8 +122,6 @@ def parse_mien_bac(html: bytes | str) -> list[PrizeRow]:
     if not isinstance(inner, Tag):
         return []
 
-    # Verified against the public Minh Ngoc result structure: giai1..giai8
-    # correspond directly to Giải nhất..Giải tám; giaidb is Giải Đặc Biệt.
     mapping = (
         ("giai8l", "giai8", "Giải tám"),
         ("giai7l", "giai7", "Giải bảy"),
@@ -126,21 +147,35 @@ def parse_mien_bac(html: bytes | str) -> list[PrizeRow]:
     return rows
 
 
+def _result_tables(soup: BeautifulSoup) -> list[Tag]:
+    """Find province result tables without assuming a region wrapper class."""
+    prize_classes = (
+        "giai8", "giai7", "giai6", "giai5", "giai4",
+        "giai3", "giai2", "giai1", "giaidb",
+    )
+    tables: list[Tag] = []
+    for table in soup.find_all("table"):
+        if not isinstance(table, Tag):
+            continue
+        province_cell = table.find("td", class_="tinh")
+        if not isinstance(province_cell, Tag):
+            continue
+        if any(isinstance(table.find("td", class_=cls), Tag) for cls in prize_classes):
+            tables.append(table)
+    return tables
+
+
 def parse_mien_nam_trung(html: bytes | str, region: str) -> list[PrizeRow]:
     if region not in {"mien-nam", "mien-trung"}:
         raise ValueError(f"Unsupported region: {region}")
     soup = BeautifulSoup(html, "html.parser")
-    main = soup.find("table", class_="bkqmiennam")
-    if not isinstance(main, Tag):
-        return []
-
     prize_classes = (
         ("giai8", "Giải tám"), ("giai7", "Giải bảy"), ("giai6", "Giải sáu"),
         ("giai5", "Giải năm"), ("giai4", "Giải tư"), ("giai3", "Giải ba"),
         ("giai2", "Giải nhì"), ("giai1", "Giải nhất"), ("giaidb", "Giải Đặc Biệt"),
     )
     rows: list[PrizeRow] = []
-    for table in main.find_all("table", class_="rightcl"):
+    for table in _result_tables(soup):
         province_cell = table.find("td", class_="tinh")
         if not isinstance(province_cell, Tag):
             continue
