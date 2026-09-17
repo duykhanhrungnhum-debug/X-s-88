@@ -34,16 +34,19 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import os
-          from urllib.parse import urlparse
+          from urllib.parse import urlsplit
           import requests
 
-          url = os.environ["SUPABASE_URL"].strip()
-          parsed = urlparse(url)
+          raw = os.environ["SUPABASE_URL"].strip()
+          parsed = urlsplit(raw)
+          path = parsed.path.rstrip("/")
           print(f"Supabase scheme={parsed.scheme!r} host={parsed.netloc!r} path={parsed.path!r}")
           assert parsed.scheme == "https", "SUPABASE_URL must use https"
           assert parsed.netloc == "mwdlwvychuolybbfvyem.supabase.co", "SUPABASE_URL host is unexpected"
-          assert parsed.path in ("", "/"), "SUPABASE_URL must not contain an API path"
-          endpoint = url.rstrip("/") + "/rest/v1/source_fetches?select=id&limit=1"
+          assert path in ("", "/rest/v1"), "SUPABASE_URL must be project URL, optionally ending /rest/v1"
+          assert not parsed.query and not parsed.fragment, "SUPABASE_URL must not contain query or fragment"
+          base = f"{parsed.scheme}://{parsed.netloc}"
+          endpoint = base + "/rest/v1/source_fetches?select=id&limit=1"
           response = requests.get(
               endpoint,
               headers={
