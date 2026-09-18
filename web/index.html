@@ -1,70 +1,109 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Xoso88 — Kết quả xổ số</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172033;background:#f5f7fb}*{box-sizing:border-box}body{margin:0}header{background:#111827;color:#fff;padding:16px 20px}.wrap{max-width:1080px;margin:auto;padding:0 20px}nav{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:24px;font-weight:800}.badge{font-size:12px;border:1px solid #4b5563;border-radius:999px;padding:5px 9px;color:#d1d5db}main{padding:28px 0 50px}.hero{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.06)}h1{margin:0 0 8px;font-size:clamp(28px,5vw,44px)}.lead{color:#5b6475;line-height:1.6;max-width:760px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}.toolbar button{border:1px solid #d1d5db;background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.toolbar button.active{background:#111827;color:#fff}.result{margin-top:18px;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff}.result-head{padding:16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.live{font-weight:700}.small{font-size:12px;color:#6b7280}.empty{padding:28px;text-align:center;color:#6b7280}table{width:100%;border-collapse:collapse}th,td{padding:13px 12px;border-bottom:1px solid #eef0f4;text-align:center}th{width:150px;text-align:left;background:#f8fafc}td{font-size:20px;font-weight:700;letter-spacing:1px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px}.card h2{margin:0 0 8px;font-size:18px}.muted{color:#6b7280;line-height:1.5}footer{color:#6b7280;font-size:13px;padding:24px 0}@media(max-width:640px){th{width:105px}td{font-size:17px;padding:10px 5px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b5cab">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Xoso88 — Kết quả xổ số</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#202733;background:#f1f3f6;--blue:#075baa;--blue2:#0d6fc7;--red:#d71920;--line:#d9dee5;--soft:#f7f8fa}
+*{box-sizing:border-box}body{margin:0;background:var(--soft)}
+a{color:inherit}.top{background:#fff;border-bottom:1px solid var(--line)}.topbar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:25px;font-weight:900;color:var(--blue);letter-spacing:-.5px}.tag{font-size:12px;color:#657080}
+.nav{background:var(--blue);color:#fff}.navin{max-width:1100px;margin:auto;display:flex;overflow:auto}.nav button{border:0;background:transparent;color:#fff;font-weight:800;padding:12px 18px;white-space:nowrap;cursor:pointer}.nav button.active{background:#084d8d}
+.wrap{max-width:1100px;margin:auto;padding:12px 12px 36px}
+.tools{background:#fff;border:1px solid var(--line);padding:12px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.datebox{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.datebox button,.datebox input{height:38px;border:1px solid #c9d0d9;background:#fff;border-radius:5px;padding:0 11px;font-weight:700}.datebox button{cursor:pointer}.datebox .today{background:var(--blue);color:#fff;border-color:var(--blue)}
+.status{font-size:13px;color:#66717f;text-align:right}
+.titlebar{background:#fff;border:1px solid var(--line);border-bottom:3px solid var(--blue);padding:13px 14px;margin-bottom:12px}.titlebar h1{font-size:21px;margin:0;color:#1e2937}.titlebar p{margin:5px 0 0;color:#6a7481;font-size:13px}
+.draw{background:#fff;border:1px solid var(--line);margin-bottom:16px;overflow:hidden}.drawhead{background:#eef5fc;border-bottom:1px solid #cbdced;padding:11px 13px;display:flex;justify-content:space-between;gap:10px;align-items:center}.province{font-weight:900;color:#0b4f91}.code{font-size:12px;color:#687687}.weekday{font-size:13px;color:#66717f}
+table{width:100%;border-collapse:collapse;table-layout:fixed}.prize{width:125px;background:#fafbfc;color:#3c4652;font-weight:800;font-size:13px;text-align:left}.db .prize{color:var(--red)}th,td{border-bottom:1px solid var(--line);padding:9px 8px;vertical-align:middle}tr:last-child th,tr:last-child td{border-bottom:0}.nums{font-size:19px;font-weight:700;line-height:1.65;text-align:center;word-break:break-word;letter-spacing:.4px}.db .nums{font-size:25px;color:var(--red);font-weight:900}.empty{padding:36px 18px;text-align:center;color:#687483;background:#fff}.empty strong{display:block;color:#2e3947;margin-bottom:6px;font-size:16px}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.quick button{border:1px solid #ccd3dc;background:#fff;border-radius:5px;padding:8px 12px;font-weight:700;cursor:pointer}
+.footer{max-width:1100px;margin:auto;padding:10px 12px 30px;color:#7b8490;font-size:12px;text-align:center}
+@media(max-width:680px){.topbar{padding:9px 12px}.brand{font-size:22px}.tools{grid-template-columns:1fr}.status{text-align:left}.wrap{padding:8px 7px 28px}.titlebar h1{font-size:18px}.drawhead{align-items:flex-start}.prize{width:82px;font-size:12px}.nums{font-size:16px;line-height:1.55}.db .nums{font-size:22px}.datebox input{width:145px}.nav button{padding:11px 14px}}
+</style>
 </head>
 <body>
-<header><div class="wrap"><nav><div class="brand">Xoso88</div><span class="badge">Live • dữ liệu xác thực</span></nav></div></header>
-<main><div class="wrap">
-<section class="hero">
-  <h1>Kết quả xổ số</h1>
-  <p class="lead">Chỉ hiển thị các bản ghi đã đi qua FETCHED → PARSED → VALIDATED → PUBLISHED. Không có dữ liệu thật thì không hiển thị số giả.</p>
-  <div class="toolbar" role="tablist" aria-label="Khu vực">
-    <button class="active" data-region="north">Miền Bắc</button>
-    <button data-region="central">Miền Trung</button>
-    <button data-region="south">Miền Nam</button>
+<header class="top"><div class="topbar"><div class="brand">Xoso88</div><div class="tag">Kết quả xổ số • dữ liệu xác thực</div></div></header>
+<nav class="nav"><div class="navin" role="tablist">
+<button class="active" data-region="south">Miền Nam</button><button data-region="central">Miền Trung</button><button data-region="north">Miền Bắc</button>
+</div></nav>
+
+<main class="wrap">
+<section class="tools">
+  <div>
+    <div class="datebox">
+      <button id="prev" aria-label="Ngày trước">‹ Ngày trước</button>
+      <input id="date" type="date">
+      <button id="next" aria-label="Ngày sau">Ngày sau ›</button>
+      <button id="today" class="today">Hôm nay</button>
+    </div>
+    <div class="quick"><button data-offset="-1">Hôm qua</button><button data-offset="-7">7 ngày trước</button></div>
   </div>
-  <div class="result">
-    <div class="result-head"><div><strong id="regionTitle">Xổ số Miền Bắc</strong><div class="small" id="dateLabel">Đang tải dữ liệu đã xác thực…</div></div><div class="live" id="status">● Đang đồng bộ</div></div>
-    <div id="resultBody" class="empty">Đang tải…</div>
-  </div>
+  <div class="status" id="status">Đang tải…</div>
 </section>
-<section class="grid">
-  <article class="card"><h2>🔄 Tự làm mới</h2><p class="muted">Kiểm tra API mỗi 30 giây bằng cache: no-store và timestamp chống cache.</p></article>
-  <article class="card"><h2>✓ Xác thực</h2><p class="muted">Website chỉ đọc API công khai; service-role key không bao giờ được đưa vào trình duyệt.</p></article>
-  <article class="card"><h2>🔎 Minh bạch</h2><p class="muted">Mỗi kết quả giữ nguồn, ngày quay và trạng thái xác thực ở backend.</p></article>
+
+<section class="titlebar">
+  <h1 id="pageTitle">KẾT QUẢ XỔ SỐ MIỀN NAM</h1>
+  <p id="dateTitle">Đang tải dữ liệu đã xác thực…</p>
 </section>
-</div></main>
-<footer><div class="wrap">Xoso88 — nguồn dữ liệu công khai và pipeline xác thực.</div></footer>
+
+<section id="results"><div class="empty"><strong>Đang tải kết quả…</strong>Đang kết nối nguồn dữ liệu xác thực.</div></section>
+</main>
+<footer class="footer">Xoso88 chỉ hiển thị kết quả đã đi qua FETCHED → PARSED → VALIDATED → PUBLISHED. Không có dữ liệu thật thì không hiển thị số giả.</footer>
+
 <script>
 const API_BASE='https://mwdlwvychuolybbfvyem.supabase.co/functions/v1/public-results';
-const REFRESH_MS=30000;
-let region='north';
-const regionNames={north:'Miền Bắc',central:'Miền Trung',south:'Miền Nam'};
-function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderDraws(draws){
-  if(!Array.isArray(draws)||!draws.length)return '<div class="empty">Chưa có dữ liệu đã xác thực cho khu vực này.</div>';
-  const draw=draws[0];
-  const rows=(draw.results||[]).map(r=>`<tr><th>${escapeHtml(r.prize_name)}</th><td>${(r.numbers||[]).map(escapeHtml).join(' &nbsp; ')}</td></tr>`).join('');
-  return rows?`<table><tbody>${rows}</tbody></table>`:'<div class="empty">Bản ghi chưa có giải thưởng.</div>';
+const regionNames={south:'Miền Nam',central:'Miền Trung',north:'Miền Bắc'};
+let region='south';
+const dateEl=document.getElementById('date');
+
+function isoDate(d){return d.toISOString().slice(0,10)}
+function localDate(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000)}
+function setDate(d){dateEl.value=isoDate(d);refresh()}
+function shift(days){const d=new Date(dateEl.value+'T12:00:00');d.setDate(d.getDate()+days);setDate(d)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(v){if(!v)return '';const [y,m,d]=v.split('-');return d+'/'+m+'/'+y}
+function renderDraw(draw){
+  const results=Array.isArray(draw.results)?draw.results:[];
+  const rows=results.map(r=>{
+    const db=String(r.prize_name||'').toLowerCase().includes('đặc biệt');
+    const nums=(r.numbers||[]).map(esc).join(' &nbsp; ');
+    return '<tr class="'+(db?'db':'')+'"><th class="prize">'+esc(r.prize_name)+'</th><td class="nums">'+nums+'</td></tr>';
+  }).join('');
+  return '<article class="draw"><div class="drawhead"><div><div class="province">'+esc(draw.province_name||'Xổ số '+regionNames[region])+'</div><div class="code">'+esc(draw.province_code||'')+'</div></div><div class="weekday">'+fmtDate(draw.draw_date)+'</div></div><table><tbody>'+rows+'</tbody></table></article>';
 }
 async function refresh(){
-  const status=document.getElementById('status');
+  const selected=dateEl.value;
+  document.getElementById('status').textContent='Đang đồng bộ…';
+  document.getElementById('pageTitle').textContent='KẾT QUẢ XỔ SỐ '+regionNames[region].toUpperCase();
+  document.getElementById('dateTitle').textContent='Ngày '+fmtDate(selected)+' • chỉ hiển thị bản ghi đã xác thực';
+  document.getElementById('results').innerHTML='<div class="empty"><strong>Đang tải…</strong>Đang kiểm tra dữ liệu của ngày đã chọn.</div>';
   try{
-    const url=`${API_BASE}?region=${encodeURIComponent(region)}&_=${Date.now()}`;
-    const response=await fetch(url,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const payload=await response.json();
-    document.getElementById('resultBody').innerHTML=renderDraws(payload.draws);
-    const draw=payload.draws?.[0];
-    document.getElementById('dateLabel').textContent=draw?.draw_date?`Ngày ${escapeHtml(draw.draw_date)} • Nguồn: ${escapeHtml(draw.source_url||'Minh Ngọc')}`:'Chưa có bản ghi';
-    status.textContent=`● Cập nhật ${new Date().toLocaleTimeString('vi-VN')}`;
-  }catch(error){
-    document.getElementById('resultBody').innerHTML='<div class="empty">Chưa kết nối được API hoặc chưa có bản ghi đã xác thực.</div>';
-    document.getElementById('dateLabel').textContent='API chưa trả dữ liệu';
-    status.textContent='● Chưa kết nối dữ liệu';
+    const url=API_BASE+'?region='+encodeURIComponent(region)+'&date='+encodeURIComponent(selected)+'&_='+Date.now();
+    const res=await fetch(url,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const payload=await res.json();
+    const draws=Array.isArray(payload.draws)?payload.draws:[];
+    document.getElementById('results').innerHTML=draws.length?draws.map(renderDraw).join(''):'<div class="empty"><strong>Chưa có kết quả cho ngày này</strong>Nguồn chưa có bản ghi đã xác thực, hoặc ngày này chưa được thu thập.</div>';
+    document.getElementById('status').textContent='Cập nhật '+new Date().toLocaleTimeString('vi-VN');
+  }catch(e){
+    document.getElementById('results').innerHTML='<div class="empty"><strong>Chưa kết nối được dữ liệu</strong>API chưa trả kết quả. Không hiển thị số giả.</div>';
+    document.getElementById('status').textContent='Lỗi kết nối API';
   }
 }
-document.querySelectorAll('[data-region]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-region]').forEach(b=>b.classList.remove('active'));button.classList.add('active');region=button.dataset.region;document.getElementById('regionTitle').textContent=`Xổ số ${button.textContent}`;refresh()}));
-refresh();setInterval(refresh,REFRESH_MS);
+
+dateEl.value=isoDate(localDate());
+document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-region]').forEach(x=>x.classList.remove('active'));b.classList.add('active');region=b.dataset.region;refresh()}));
+document.getElementById('prev').onclick=()=>shift(-1);
+document.getElementById('next').onclick=()=>shift(1);
+document.getElementById('today').onclick=()=>setDate(localDate());
+document.querySelectorAll('[data-offset]').forEach(b=>b.onclick=()=>{const d=localDate();d.setDate(d.getDate()+Number(b.dataset.offset));setDate(d)});
+dateEl.addEventListener('change',refresh);
+refresh();
+setInterval(refresh,30000);
 </script>
 </body>
 </html>
