@@ -73,7 +73,7 @@ function renderDraw(draw){
     const nums=(r.numbers||[]).map(esc).join(' &nbsp; ');
     return '<tr class="'+(db?'db':'')+'"><th class="prize">'+esc(r.prize_name)+'</th><td class="nums">'+nums+'</td></tr>';
   }).join('');
-  return '<article class="draw"><div class="drawhead"><div><div class="province">'+esc(draw.province_name||'Xổ số '+regionNames[region])+'</div><div class="code">'+esc(draw.province_code||'')+'</div></div><div class="weekday">'+fmtDate(draw.draw_date)+'</div></div><table><tbody>'+rows+'</tbody></table></article>';
+  return '<article class="draw"><div class="drawhead"><div><div class="province">'+esc(draw.province?.name||draw.province_name||'Xổ số '+regionNames[region])+'</div><div class="code">'+esc(draw.province?.code||draw.province_code||'')+'</div></div><div class="weekday">'+fmtDate(draw.draw_date)+'</div></div><table><tbody>'+rows+'</tbody></table></article>';
 }
 async function refresh(){
   const selected=dateEl.value;
