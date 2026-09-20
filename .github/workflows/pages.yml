@@ -28,10 +28,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Build static province pages
+        run: python scripts/build_site.py
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './web'
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
@@ -73,3 +75,12 @@ jobs:
           done
           echo "Latest frontend was not visible on GitHub Pages after retries"
           exit 1
+
+      - name: Verify province SEO page
+        run: |
+          page="$(curl -fsSL "https://duykhanhrungnhum-debug.github.io/X-s-88/tinh/tay-ninh/?v=${GITHUB_SHA}")"
+          printf '%s' "$page" | grep -q "KẾT QUẢ XỔ SỐ Tây Ninh"
+          printf '%s' "$page" | grep -q "PROVINCE_CODE='tay-ninh'"
+          sitemap="$(curl -fsSL "https://duykhanhrungnhum-debug.github.io/X-s-88/sitemap.xml?v=${GITHUB_SHA}")"
+          printf '%s' "$sitemap" | grep -q "/tinh/tay-ninh/"
+          echo "Province page OK: Tay Ninh history page and sitemap are live"
