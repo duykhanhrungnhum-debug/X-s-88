@@ -33,7 +33,7 @@ def test_collect_maps_source_region_to_database_enum(monkeypatch):
     monkeypatch.setattr(collect_live.SupabaseStore, "from_env", lambda: store)
     monkeypatch.setattr(collect_live, "fetch_html", lambda url: response)
     monkeypatch.setattr(collect_live, "extract_region_result_date", lambda content, region: date(2026, 9, 15))
-    monkeypatch.setattr(collect_live, "parse_html", lambda content, region: rows)
+    monkeypatch.setattr(collect_live, "parse_html", lambda content, region, target_date=None: rows)
     monkeypatch.setattr(collect_live, "validate_result", lambda result: result)
     monkeypatch.setattr(
         collect_live,
@@ -64,7 +64,7 @@ def test_collect_refuses_mismatched_source_date(monkeypatch):
     monkeypatch.setattr(collect_live.SupabaseStore, "from_env", lambda: store)
     monkeypatch.setattr(collect_live, "fetch_html", lambda url: response)
     monkeypatch.setattr(collect_live, "extract_region_result_date", lambda content, region: date(2026, 9, 16))
-    monkeypatch.setattr(collect_live, "parse_html", lambda content, region: pytest.fail("parser must not run"))
+    monkeypatch.setattr(collect_live, "parse_html", lambda content, region, target_date=None: pytest.fail("parser must not run"))
 
     with pytest.raises(RuntimeError, match="refusing to publish mismatched data"):
         collect_live.collect("mien-nam", date(2026, 9, 17))
