@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
 import unicodedata
 
 from .models import LotteryResult
@@ -108,7 +109,11 @@ def main() -> None:
         help="Exact source date to collect. Omit for scheduled mode, which waits for today's published results.",
     )
     args = parser.parse_args()
-    target_date = date.fromisoformat(args.date) if args.date else date.today()
+    target_date = (
+        date.fromisoformat(args.date)
+        if args.date
+        else datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).date()
+    )
 
     try:
         ids = collect(args.region, target_date)
