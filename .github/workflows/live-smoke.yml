@@ -29,23 +29,12 @@ jobs:
           for region, expected_count in expected.items():
               url = build_region_url(region, target)
               response = fetch_html(url)
-              rows = parse_html(response.content, region)
+              rows = parse_html(response.content, region, target)
               provinces = sorted({row.province for row in rows})
               print(f"{region}: HTTP={response.status_code} provinces={provinces}")
               if response.status_code != 200:
                   raise SystemExit(f"{region}: unexpected HTTP status")
               if len(provinces) != expected_count:
-                  if region == "mien-trung":
-                      from bs4 import BeautifulSoup, Tag
-                      soup = BeautifulSoup(response.content, "html.parser")
-                      for cell in soup.find_all("td", class_="tinh")[:20]:
-                          chain = []
-                          parent = cell.parent
-                          while isinstance(parent, Tag):
-                              if parent.name in ("table", "div", "section"):
-                                  chain.append(f"{parent.name}.{'.'.join(parent.get('class', []))}#{parent.get('id', '')}")
-                              parent = parent.parent
-                          print("DOM", cell.get_text(" ", strip=True), "=>", " > ".join(chain[:8]))
                   raise SystemExit(
                       f"{region}: expected {expected_count} provinces for {target}, got {len(provinces)}: {provinces}"
                   )
