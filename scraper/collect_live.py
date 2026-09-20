@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
+import re
 import unicodedata
 
 from .models import LotteryResult
@@ -29,10 +30,11 @@ class SourceDateMismatchError(RuntimeError):
 
 
 def province_code(name: str) -> str:
-    """Create a stable ASCII province key from the source display name."""
-    normalized = unicodedata.normalize("NFKD", name.strip())
+    """Create a stable lowercase ASCII slug from the source display name."""
+    source = name.strip().replace("Đ", "D").replace("đ", "d")
+    normalized = unicodedata.normalize("NFKD", source)
     ascii_name = normalized.encode("ascii", "ignore").decode("ascii").lower()
-    return "-".join(ascii_name.split())
+    return re.sub(r"[^a-z0-9]+", "-", ascii_name).strip("-")
 
 
 def collect(region: str, target_date: date) -> list[str]:
