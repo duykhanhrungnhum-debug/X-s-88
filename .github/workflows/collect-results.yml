@@ -15,7 +15,9 @@ on:
         default: ""
         type: string
   schedule:
-    - cron: "*/10 * * * *"
+    # 16:00-20:59 Vietnam time (UTC+7): active publication window.
+    # Manual dispatch remains available for backfills or exceptional delays.
+    - cron: "*/10 9-13 * * *"
 
 permissions:
   contents: read
