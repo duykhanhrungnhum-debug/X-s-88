@@ -92,6 +92,74 @@ def test_parse_mien_trung_uses_province_tables():
     assert any(row.province == "Đà Nẵng" and row.prize == "Giải nhất" and row.numbers == ("90069",) for row in rows)
 
 
+
+def test_mien_nam_ignores_sidebar_province_tables_outside_primary_result_block():
+    html = """
+    <div>KẾT QUẢ XỔ SỐ Miền Nam - 20/09/2026</div>
+    <table class="bkqmiennam"><tr><td>
+      <table class="rightcl">
+        <td class="tinh">Tiền Giang</td>
+        <td class="giai8"><div>08</div></td>
+        <td class="giaidb"><div>248087</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Kiên Giang</td>
+        <td class="giai8"><div>35</div></td>
+        <td class="giaidb"><div>237748</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Đà Lạt</td>
+        <td class="giai8"><div>44</div></td>
+        <td class="giaidb"><div>722323</div></td>
+      </table>
+    </td></tr></table>
+    <aside>
+      <table class="rightcl">
+        <td class="tinh">Tây Ninh</td>
+        <td class="giai8"><div>77</div></td>
+        <td class="giaidb"><div>024183</div></td>
+      </table>
+    </aside>
+    """
+    rows = parse_html(html, "mien-nam")
+    provinces = {row.province for row in rows}
+    assert provinces == {"Tiền Giang", "Kiên Giang", "Đà Lạt"}
+    assert "Tây Ninh" not in provinces
+
+
+def test_mien_trung_ignores_sidebar_province_tables_when_primary_wrapper_exists():
+    html = """
+    <div>KẾT QUẢ XỔ SỐ Miền Trung - 20/09/2026</div>
+    <table class="bkqmientrung"><tr><td>
+      <table class="rightcl">
+        <td class="tinh">Kon Tum</td>
+        <td class="giai8"><div>38</div></td>
+        <td class="giaidb"><div>595460</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Huế</td>
+        <td class="giai8"><div>05</div></td>
+        <td class="giaidb"><div>172613</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Khánh Hòa</td>
+        <td class="giai8"><div>02</div></td>
+        <td class="giaidb"><div>921848</div></td>
+      </table>
+    </td></tr></table>
+    <aside>
+      <table class="rightcl">
+        <td class="tinh">Đà Nẵng</td>
+        <td class="giai8"><div>99</div></td>
+        <td class="giaidb"><div>999999</div></td>
+      </table>
+    </aside>
+    """
+    rows = parse_html(html, "mien-trung")
+    provinces = {row.province for row in rows}
+    assert provinces == {"Kon Tum", "Huế", "Khánh Hòa"}
+    assert "Đà Nẵng" not in provinces
+
 def test_rate_limiter_enforces_five_seconds_per_host():
     clock = [100.0]
     sleeps: list[float] = []
