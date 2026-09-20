@@ -113,7 +113,10 @@ jobs:
             echo "Required repository secrets SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not configured."
             exit 1
           fi
+          first=1
           for region in mien-bac mien-trung mien-nam; do
+            if [ "$first" -eq 0 ]; then sleep 5; fi
+            first=0
             echo "Collecting $region"
             if [ -n "$TARGET_DATE" ]; then
               python -m scraper.collect_live --region "$region" --date "$TARGET_DATE"
