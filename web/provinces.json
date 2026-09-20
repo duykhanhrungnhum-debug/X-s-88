@@ -1,0 +1,182 @@
+[
+  {
+    "code": "ha-noi",
+    "name": "Hà Nội",
+    "region": "north"
+  },
+  {
+    "code": "binh-dinh",
+    "name": "Bình Định",
+    "region": "central"
+  },
+  {
+    "code": "da-nang",
+    "name": "Đà Nẵng",
+    "region": "central"
+  },
+  {
+    "code": "dak-lak",
+    "name": "Đắk Lắk",
+    "region": "central"
+  },
+  {
+    "code": "dak-nong",
+    "name": "Đắk Nông",
+    "region": "central"
+  },
+  {
+    "code": "gia-lai",
+    "name": "Gia Lai",
+    "region": "central"
+  },
+  {
+    "code": "hue",
+    "name": "Huế",
+    "region": "central"
+  },
+  {
+    "code": "khanh-hoa",
+    "name": "Khánh Hòa",
+    "region": "central"
+  },
+  {
+    "code": "kon-tum",
+    "name": "Kon Tum",
+    "region": "central"
+  },
+  {
+    "code": "ninh-thuan",
+    "name": "Ninh Thuận",
+    "region": "central"
+  },
+  {
+    "code": "phu-yen",
+    "name": "Phú Yên",
+    "region": "central"
+  },
+  {
+    "code": "quang-binh",
+    "name": "Quảng Bình",
+    "region": "central"
+  },
+  {
+    "code": "quang-nam",
+    "name": "Quảng Nam",
+    "region": "central"
+  },
+  {
+    "code": "quang-ngai",
+    "name": "Quảng Ngãi",
+    "region": "central"
+  },
+  {
+    "code": "quang-tri",
+    "name": "Quảng Trị",
+    "region": "central"
+  },
+  {
+    "code": "an-giang",
+    "name": "An Giang",
+    "region": "south"
+  },
+  {
+    "code": "bac-lieu",
+    "name": "Bạc Liêu",
+    "region": "south"
+  },
+  {
+    "code": "ben-tre",
+    "name": "Bến Tre",
+    "region": "south"
+  },
+  {
+    "code": "binh-duong",
+    "name": "Bình Dương",
+    "region": "south"
+  },
+  {
+    "code": "binh-phuoc",
+    "name": "Bình Phước",
+    "region": "south"
+  },
+  {
+    "code": "binh-thuan",
+    "name": "Bình Thuận",
+    "region": "south"
+  },
+  {
+    "code": "ca-mau",
+    "name": "Cà Mau",
+    "region": "south"
+  },
+  {
+    "code": "can-tho",
+    "name": "Cần Thơ",
+    "region": "south"
+  },
+  {
+    "code": "da-lat",
+    "name": "Đà Lạt",
+    "region": "south"
+  },
+  {
+    "code": "dong-nai",
+    "name": "Đồng Nai",
+    "region": "south"
+  },
+  {
+    "code": "dong-thap",
+    "name": "Đồng Tháp",
+    "region": "south"
+  },
+  {
+    "code": "hau-giang",
+    "name": "Hậu Giang",
+    "region": "south"
+  },
+  {
+    "code": "kien-giang",
+    "name": "Kiên Giang",
+    "region": "south"
+  },
+  {
+    "code": "long-an",
+    "name": "Long An",
+    "region": "south"
+  },
+  {
+    "code": "soc-trang",
+    "name": "Sóc Trăng",
+    "region": "south"
+  },
+  {
+    "code": "tay-ninh",
+    "name": "Tây Ninh",
+    "region": "south"
+  },
+  {
+    "code": "tien-giang",
+    "name": "Tiền Giang",
+    "region": "south"
+  },
+  {
+    "code": "tp-hcm",
+    "name": "TP. HCM",
+    "region": "south"
+  },
+  {
+    "code": "tra-vinh",
+    "name": "Trà Vinh",
+    "region": "south"
+  },
+  {
+    "code": "vinh-long",
+    "name": "Vĩnh Long",
+    "region": "south"
+  },
+  {
+    "code": "vung-tau",
+    "name": "Vũng Tàu",
+    "region": "south"
+  }
+]
