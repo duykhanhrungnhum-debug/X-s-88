@@ -78,3 +78,13 @@ def test_all_source_regions_have_database_enum_mapping():
         "mien-trung": "central",
         "mien-nam": "south",
     }
+
+
+def test_province_code_preserves_vietnamese_d_as_ascii_d():
+    assert collect_live.province_code("Đà Nẵng") == "da-nang"
+    assert collect_live.province_code("Đồng Nai") == "dong-nai"
+    assert collect_live.province_code("Đắk Nông") == "dak-nong"
+
+
+def test_province_code_normalizes_punctuation():
+    assert collect_live.province_code("TP. HCM") == "tp-hcm"
