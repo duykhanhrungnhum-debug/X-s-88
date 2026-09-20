@@ -71,7 +71,7 @@ def collect(region: str, target_date: date) -> list[str]:
             f"but collector requested {target_date.isoformat()}; refusing to publish mismatched data"
         )
 
-    rows = parse_html(response.content, region)
+    rows = parse_html(response.content, region, target_date)
     if not rows:
         raise RuntimeError(f"No {region} result rows found for {target_date.isoformat()} at {url}")
 
