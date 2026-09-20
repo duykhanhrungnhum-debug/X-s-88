@@ -23,6 +23,27 @@ SOURCE_REGION_NAMES = {
     "mien-nam": "Nam",
 }
 
+EXPECTED_PROVINCES_BY_WEEKDAY = {
+    "mien-nam": {
+        0: {"TP. HCM", "Đồng Tháp", "Cà Mau"},
+        1: {"Bến Tre", "Vũng Tàu", "Bạc Liêu"},
+        2: {"Đồng Nai", "Cần Thơ", "Sóc Trăng"},
+        3: {"Tây Ninh", "An Giang", "Bình Thuận"},
+        4: {"Vĩnh Long", "Bình Dương", "Trà Vinh"},
+        5: {"TP. HCM", "Long An", "Bình Phước", "Hậu Giang"},
+        6: {"Tiền Giang", "Kiên Giang", "Đà Lạt"},
+    },
+    "mien-trung": {
+        0: {"Phú Yên", "Huế"},
+        1: {"Đắk Lắk", "Quảng Nam"},
+        2: {"Đà Nẵng", "Khánh Hòa"},
+        3: {"Bình Định", "Quảng Trị", "Quảng Bình"},
+        4: {"Gia Lai", "Ninh Thuận"},
+        5: {"Đà Nẵng", "Quảng Ngãi", "Đắk Nông"},
+        6: {"Kon Tum", "Huế", "Khánh Hòa"},
+    },
+}
+
 
 @dataclass(frozen=True)
 class FetchResponse:
@@ -214,9 +235,17 @@ def parse_mien_nam_trung(html: bytes | str, region: str) -> list[PrizeRow]:
     return rows
 
 
-def parse_html(html: bytes | str, region: str) -> list[PrizeRow]:
+def parse_html(
+    html: bytes | str,
+    region: str,
+    target_date: date | None = None,
+) -> list[PrizeRow]:
     if region == "mien-bac":
         return parse_mien_bac(html)
     if region in {"mien-nam", "mien-trung"}:
-        return parse_mien_nam_trung(html, region)
+        rows = parse_mien_nam_trung(html, region)
+        if target_date is None:
+            return rows
+        expected = EXPECTED_PROVINCES_BY_WEEKDAY[region][target_date.weekday()]
+        return [row for row in rows if row.province in expected]
     raise ValueError(f"Unsupported region: {region}")
