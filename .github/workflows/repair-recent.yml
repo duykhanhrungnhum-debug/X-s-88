@@ -1,0 +1,94 @@
+name: Repair recent Xoso88 results
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-recent.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: Remove polluted recent draws
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python - <<'PY'
+          import os, requests
+          base=os.environ["SUPABASE_URL"].rstrip("/")
+          if base.endswith("/rest/v1"):
+              base=base[:-8]
+          key=os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+          r=requests.delete(
+              base+"/rest/v1/lottery_draws",
+              params={"draw_date":"gte.2026-09-17","and":"(draw_date.lte.2026-09-20)"},
+              headers={"apikey":key,"Prefer":"return=minimal"},
+              timeout=30,
+          )
+          print("DELETE_STATUS", r.status_code)
+          if r.status_code >= 400:
+              raise SystemExit(r.text[:500])
+          PY
+
+      - name: Recollect 17-20 September from verified daily pages
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          first=1
+          for d in 2026-09-17 2026-09-18 2026-09-19 2026-09-20; do
+            for region in mien-bac mien-trung mien-nam; do
+              if [ "$first" -eq 0 ]; then sleep 5; fi
+              first=0
+              echo "Repairing $d $region"
+              python -m scraper.collect_live --region "$region" --date "$d"
+            done
+          done
+
+      - name: Verify repaired province counts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python - <<'PY'
+          import os, requests
+          expected={
+            "2026-09-17":{"north":1,"central":3,"south":3},
+            "2026-09-18":{"north":1,"central":2,"south":3},
+            "2026-09-19":{"north":1,"central":3,"south":4},
+            "2026-09-20":{"north":1,"central":3,"south":3},
+          }
+          base=os.environ["SUPABASE_URL"].rstrip("/")
+          if base.endswith("/rest/v1"):
+              base=base[:-8]
+          key=os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+          headers={"apikey":key,"Accept":"application/json"}
+          r=requests.get(
+              base+"/rest/v1/lottery_draws",
+              params={"select":"draw_date,province:lottery_provinces!inner(region,name)","draw_date":"gte.2026-09-17","order":"draw_date.asc"},
+              headers=headers,
+              timeout=30,
+          )
+          r.raise_for_status()
+          actual={}
+          for row in r.json():
+              actual.setdefault(row["draw_date"],{}).setdefault(row["province"]["region"],[]).append(row["province"]["name"])
+          print("REPAIRED", actual)
+          for d, regions in expected.items():
+              for region, count in regions.items():
+                  names=actual.get(d,{}).get(region,[])
+                  assert len(names)==count, f"{d} {region}: expected {count}, got {len(names)} {names}"
+          print("REPAIR_VERIFY=PASS")
+          PY
