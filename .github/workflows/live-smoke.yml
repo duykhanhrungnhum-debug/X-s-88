@@ -38,5 +38,17 @@ jobs:
                   raise SystemExit(
                       f"{region}: expected {expected_count} provinces for {target}, got {len(provinces)}: {provinces}"
                   )
+              if region in {"mien-trung", "mien-nam"}:
+                  expected_number_counts = {
+                      "Giải tám": 1, "Giải bảy": 1, "Giải sáu": 3,
+                      "Giải năm": 1, "Giải tư": 7, "Giải ba": 2,
+                      "Giải nhì": 1, "Giải nhất": 1, "Giải Đặc Biệt": 1,
+                  }
+                  for row in rows:
+                      want = expected_number_counts[row.prize]
+                      if len(row.numbers) != want:
+                          raise SystemExit(
+                              f"{region} {row.province} {row.prize}: expected {want} number(s), got {len(row.numbers)} {row.numbers}"
+                          )
           print("LIVE_SMOKE=PASS")
           PY
