@@ -147,20 +147,44 @@ def parse_mien_bac(html: bytes | str) -> list[PrizeRow]:
     return rows
 
 
-def _result_tables(soup: BeautifulSoup) -> list[Tag]:
-    """Find province result tables without assuming a region wrapper class."""
+def _result_tables(soup: BeautifulSoup, region: str) -> list[Tag]:
+    """Find only province tables inside the requested region's primary result block.
+
+    Minh Ngoc daily pages also contain province widgets/navigation outside the
+    current result block. Scanning the whole document can therefore attach
+    other provinces' numbers to the requested draw date.
+    """
+    wrapper_class = {
+        "mien-nam": "bkqmiennam",
+        "mien-trung": "bkqmientrung",
+    }.get(region)
+    scope: Tag | BeautifulSoup = soup
+    if wrapper_class:
+        wrapper = soup.find("table", class_=wrapper_class)
+        if isinstance(wrapper, Tag):
+            scope = wrapper
+
     prize_classes = (
         "giai8", "giai7", "giai6", "giai5", "giai4",
         "giai3", "giai2", "giai1", "giaidb",
     )
     tables: list[Tag] = []
-    for table in soup.find_all("table"):
+    for table in scope.find_all("table"):
         if not isinstance(table, Tag):
             continue
         province_cell = table.find("td", class_="tinh")
         if not isinstance(province_cell, Tag):
             continue
-        if any(isinstance(table.find("td", class_=cls), Tag) for cls in prize_classes):
+        # Ignore wrapper tables that merely contain a nested province table.
+        if province_cell.find_parent("table") is not table:
+            continue
+        direct_prize = False
+        for cls in prize_classes:
+            cell = table.find("td", class_=cls)
+            if isinstance(cell, Tag) and cell.find_parent("table") is table:
+                direct_prize = True
+                break
+        if direct_prize:
             tables.append(table)
     return tables
 
@@ -175,7 +199,7 @@ def parse_mien_nam_trung(html: bytes | str, region: str) -> list[PrizeRow]:
         ("giai2", "Giải nhì"), ("giai1", "Giải nhất"), ("giaidb", "Giải Đặc Biệt"),
     )
     rows: list[PrizeRow] = []
-    for table in _result_tables(soup):
+    for table in _result_tables(soup, region):
         province_cell = table.find("td", class_="tinh")
         if not isinstance(province_cell, Tag):
             continue
