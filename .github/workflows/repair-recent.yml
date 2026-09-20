@@ -92,3 +92,4 @@ jobs:
                   assert len(names)==count, f"{d} {region}: expected {count}, got {len(names)} {names}"
           print("REPAIR_VERIFY=PASS")
           PY
+# rerun after repeated-province dedupe fix
