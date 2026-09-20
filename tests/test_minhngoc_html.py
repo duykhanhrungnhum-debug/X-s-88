@@ -188,6 +188,41 @@ def test_schedule_filter_keeps_current_sunday_mien_trung_provinces():
     rows = parse_html(html, "mien-trung", date(2026, 9, 20))
     assert {row.province for row in rows} == {"Kon Tum", "Huế", "Khánh Hòa"}
 
+
+def test_schedule_filter_keeps_only_first_current_table_for_repeated_province():
+    html = """
+    <div>KẾT QUẢ XỔ SỐ Miền Trung - 20/09/2026</div>
+    <table class="bkqmiennam"><tr><td>
+      <table class="rightcl">
+        <td class="tinh">Huế</td>
+        <td class="giai8"><div>05</div></td>
+        <td class="giaidb"><div>172613</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Khánh Hòa</td>
+        <td class="giai8"><div>02</div></td>
+        <td class="giaidb"><div>921848</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Huế</td>
+        <td class="giai8"><div>31</div></td>
+        <td class="giaidb"><div>542650</div></td>
+      </table>
+      <table class="rightcl">
+        <td class="tinh">Khánh Hòa</td>
+        <td class="giai8"><div>65</div></td>
+        <td class="giaidb"><div>672316</div></td>
+      </table>
+    </td></tr></table>
+    """
+    rows = parse_html(html, "mien-trung", date(2026, 9, 20))
+    hue_g8 = [r for r in rows if r.province == "Huế" and r.prize == "Giải tám"]
+    kh_db = [r for r in rows if r.province == "Khánh Hòa" and r.prize == "Giải Đặc Biệt"]
+    assert len(hue_g8) == 1
+    assert hue_g8[0].numbers == ("05",)
+    assert len(kh_db) == 1
+    assert kh_db[0].numbers == ("921848",)
+
 def test_rate_limiter_enforces_five_seconds_per_host():
     clock = [100.0]
     sleeps: list[float] = []
