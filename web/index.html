@@ -55,7 +55,7 @@ table{width:100%;border-collapse:collapse;table-layout:fixed}.prize{width:125px;
 <footer class="footer">Xoso88 chỉ hiển thị kết quả đã đi qua FETCHED → PARSED → VALIDATED → PUBLISHED. Không có dữ liệu thật thì không hiển thị số giả.</footer>
 
 <script>
-const API_BASE='https://mwdlwvychuolybbfvyem.supabase.co/functions/v1/public-results'; // public read endpoint
+const REST_BASE='https://mwdlwvychuolybbfvyem.supabase.co/rest/v1';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZGx3dnljaHVvbHliYmZ2eWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NjI5ODQsImV4cCI6MjEwNTAzODk4NH0.nHPeYHAuS4ywZJFOHXE-J3_X147o7OyP9_TJ9A2-EK4';
 const regionNames={south:'Miền Nam',central:'Miền Trung',north:'Miền Bắc'};
 let region='south';
@@ -68,7 +68,7 @@ function shift(days){const d=new Date(dateEl.value+'T12:00:00');d.setDate(d.getD
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtDate(v){if(!v)return '';const [y,m,d]=v.split('-');return d+'/'+m+'/'+y}
 function renderDraw(draw){
-  const results=Array.isArray(draw.results)?draw.results:[];
+  const results=(Array.isArray(draw.results)?draw.results:[]).slice().sort((a,b)=>(a.display_order??999)-(b.display_order??999));
   const rows=results.map(r=>{
     const db=String(r.prize_name||'').toLowerCase().includes('đặc biệt');
     const nums=(r.numbers||[]).map(esc).join(' &nbsp; ');
@@ -83,11 +83,24 @@ async function refresh(){
   document.getElementById('dateTitle').textContent='Ngày '+fmtDate(selected)+' • chỉ hiển thị bản ghi đã xác thực';
   document.getElementById('results').innerHTML='<div class="empty"><strong>Đang tải…</strong>Đang kiểm tra dữ liệu của ngày đã chọn.</div>';
   try{
-    const url=API_BASE+'?region='+encodeURIComponent(region)+'&date='+encodeURIComponent(selected)+'&_='+Date.now();
-    const res=await fetch(url,{cache:'no-store',headers:{'Cache-Control':'no-cache','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}});
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const payload=await res.json();
-    const draws=Array.isArray(payload.draws)?payload.draws:[];
+    const qs=new URLSearchParams({
+      select:'id,draw_date,source_url,published_at,province:lottery_provinces!inner(code,name,region),results:lottery_results(prize_code,prize_name,numbers,display_order)',
+      validation_status:'eq.valid',
+      published_at:'not.is.null',
+      draw_date:'eq.'+selected,
+      'lottery_provinces.region':'eq.'+region,
+      order:'published_at.desc'
+    });
+    const res=await fetch(REST_BASE+'/lottery_draws?'+qs.toString(),{
+      cache:'no-store',
+      headers:{
+        'apikey':SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+SUPABASE_ANON_KEY,
+        'Accept':'application/json'
+      }
+    });
+    if(!res.ok)throw new Error('HTTP '+res.status+' '+await res.text());
+    const draws=await res.json();
     document.getElementById('results').innerHTML=draws.length?draws.map(renderDraw).join(''):'<div class="empty"><strong>Chưa có kết quả cho ngày này</strong>Nguồn chưa có bản ghi đã xác thực, hoặc ngày này chưa được thu thập.</div>';
     document.getElementById('status').textContent='Cập nhật '+new Date().toLocaleTimeString('vi-VN');
   }catch(e){
