@@ -14,8 +14,8 @@ def test_build_generates_all_province_pages_and_directory(tmp_path, monkeypatch)
         (build_site.WEB / "provinces.json").read_text(encoding="utf-8")
     )
     generated = list((dist / "tinh").glob("*/index.html"))
-    # Province pages plus the /tinh/ directory page.
-    assert len(generated) == len(provinces) + 1
+    assert len(generated) == len(provinces)
+    assert (dist / "tinh" / "index.html").exists()
 
     tay_ninh = (dist / "tinh" / "tay-ninh" / "index.html").read_text(encoding="utf-8")
     assert "KẾT QUẢ XỔ SỐ Tây Ninh" in tay_ninh
