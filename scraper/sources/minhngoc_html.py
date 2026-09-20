@@ -247,5 +247,20 @@ def parse_html(
         if target_date is None:
             return rows
         expected = EXPECTED_PROVINCES_BY_WEEKDAY[region][target_date.weekday()]
-        return [row for row in rows if row.province in expected]
+        filtered = [row for row in rows if row.province in expected]
+
+        # The daily page can contain additional historical/widgets for a
+        # province that also draws on the selected weekday. The current draw
+        # appears first in document order, so retain only the first row for
+        # each province/prize pair. Without this guard, numbers from an older
+        # widget can be appended to the current draw.
+        deduped: list[PrizeRow] = []
+        seen: set[tuple[str, str]] = set()
+        for row in filtered:
+            key = (row.province, row.prize)
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(row)
+        return deduped
     raise ValueError(f"Unsupported region: {region}")
