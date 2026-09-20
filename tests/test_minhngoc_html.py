@@ -160,6 +160,34 @@ def test_mien_trung_ignores_sidebar_province_tables_when_primary_wrapper_exists(
     assert provinces == {"Kon Tum", "Huế", "Khánh Hòa"}
     assert "Đà Nẵng" not in provinces
 
+
+def test_schedule_filter_keeps_only_sunday_mien_nam_provinces():
+    html = """
+    <div>KẾT QUẢ XỔ SỐ Miền Nam - 20/09/2026</div>
+    <table class="bkqmiennam"><tr><td>
+      <table class="rightcl"><td class="tinh">Tiền Giang</td><td class="giai8"><div>08</div></td></table>
+      <table class="rightcl"><td class="tinh">Kiên Giang</td><td class="giai8"><div>35</div></td></table>
+      <table class="rightcl"><td class="tinh">Đà Lạt</td><td class="giai8"><div>44</div></td></table>
+      <table class="rightcl"><td class="tinh">Tây Ninh</td><td class="giai8"><div>77</div></td></table>
+    </td></tr></table>
+    """
+    rows = parse_html(html, "mien-nam", date(2026, 9, 20))
+    assert {row.province for row in rows} == {"Tiền Giang", "Kiên Giang", "Đà Lạt"}
+
+
+def test_schedule_filter_keeps_current_sunday_mien_trung_provinces():
+    html = """
+    <div>KẾT QUẢ XỔ SỐ Miền Trung - 20/09/2026</div>
+    <table class="bkqmiennam"><tr><td>
+      <table class="rightcl"><td class="tinh">Kon Tum</td><td class="giai8"><div>38</div></td></table>
+      <table class="rightcl"><td class="tinh">Huế</td><td class="giai8"><div>05</div></td></table>
+      <table class="rightcl"><td class="tinh">Khánh Hòa</td><td class="giai8"><div>02</div></td></table>
+      <table class="rightcl"><td class="tinh">Đà Nẵng</td><td class="giai8"><div>59</div></td></table>
+    </td></tr></table>
+    """
+    rows = parse_html(html, "mien-trung", date(2026, 9, 20))
+    assert {row.province for row in rows} == {"Kon Tum", "Huế", "Khánh Hòa"}
+
 def test_rate_limiter_enforces_five_seconds_per_host():
     clock = [100.0]
     sleeps: list[float] = []
