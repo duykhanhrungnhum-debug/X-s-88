@@ -36,4 +36,40 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment trigger: 2026-09-21
+      - name: Verify public results API
+        env:
+          SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZGx3dnljaHVvbHliYmZ2eWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NjI5ODQsImV4cCI6MjEwNTAzODk4NH0.nHPeYHAuS4ywZJFOHXE-J3_X147o7OyP9_TJ9A2-EK4"
+        run: |
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          params = {
+              "select": "id,draw_date,province:lottery_provinces!inner(code,name,region),results:lottery_results(prize_code,prize_name,numbers,display_order)",
+              "validation_status": "eq.valid",
+              "published_at": "not.is.null",
+              "draw_date": "eq.2026-09-18",
+              "lottery_provinces.region": "eq.south",
+              "order": "published_at.desc",
+          }
+          url = "https://mwdlwvychuolybbfvyem.supabase.co/rest/v1/lottery_draws?" + urllib.parse.urlencode(params)
+          key = os.environ["SUPABASE_ANON_KEY"]
+          req = urllib.request.Request(url, headers={"apikey": key, "Authorization": "Bearer " + key, "Accept": "application/json"})
+          with urllib.request.urlopen(req, timeout=30) as response:
+              data = json.load(response)
+          assert isinstance(data, list) and data, "No published south draws returned for 2026-09-18"
+          assert data[0].get("province"), "Province relation missing"
+          assert data[0].get("results"), "Prize results missing"
+          print(f"API OK: {len(data)} draw(s), first province={data[0]['province'].get('name')}")
+          PY
+
+      - name: Verify deployed GitHub Pages
+        run: |
+          for i in 1 2 3 4 5 6; do
+            html="$(curl -fsSL "https://duykhanhrungnhum-debug.github.io/X-s-88/?v=${GITHUB_SHA}" || true)"
+            if printf '%s' "$html" | grep -q "supabase.co/rest/v1"; then
+              echo "Pages OK: latest REST frontend is live"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Latest frontend was not visible on GitHub Pages after retries"
+          exit 1
