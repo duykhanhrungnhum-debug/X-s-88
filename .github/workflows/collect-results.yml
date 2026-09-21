@@ -15,9 +15,10 @@ on:
         default: ""
         type: string
   schedule:
-    # 16:00-20:59 Vietnam time (UTC+7): active publication window.
+    # 16:07-21:57 Vietnam time (UTC+7). Offset from the top of the hour
+    # to reduce GitHub Actions schedule congestion/dropped runs.
     # Manual dispatch remains available for backfills or exceptional delays.
-    - cron: "*/10 9-13 * * *"
+    - cron: "7,17,27,37,47,57 9-14 * * *"
 
 permissions:
   contents: read
