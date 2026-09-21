@@ -27,6 +27,12 @@ def test_homepage_has_search_and_accessibility_basics():
     assert soup.find(id="results")
     assert len(soup.select("[data-region]")) == 3
     assert soup.select_one('[aria-live="polite"]')
+    assert soup.select_one(".result-table") is None  # rendered from verified API data
+    assert soup.select_one('[data-ad-slot="top-970x90"]')
+    assert soup.select_one('[data-ad-slot="right-top-300x250"]')
+    assert soup.select_one('[data-ad-slot="right-300x600"]')
+    assert soup.select_one('[data-ad-slot="mobile-320x100"]')
+    assert "renderResults(draws)" in html
 
 
 def test_structured_data_is_valid_json():
