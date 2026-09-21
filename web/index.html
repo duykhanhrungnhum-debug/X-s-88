@@ -18,7 +18,7 @@
 :root{font-family:Arial,Helvetica,sans-serif;color:#202733;background:#eef1f5;--blue:#075baa;--blue2:#0b6cc5;--red:#d71920;--line:#d7dce3;--soft:#f7f8fa;--green:#12833a;--muted:#697482}
 *{box-sizing:border-box}html{background:#eef1f5}body{margin:0;background:#eef1f5}a{color:inherit}.top{background:#fff;border-bottom:1px solid var(--line)}.topbar{max-width:1240px;margin:auto;min-height:52px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:24px;font-weight:900;color:var(--blue);letter-spacing:-.5px;text-decoration:none}.tag{font-size:12px;color:#657080}
 .nav{background:var(--blue);color:#fff}.navin{max-width:1240px;margin:auto;display:flex;align-items:center;overflow:auto}.nav button,.nav a{border:0;background:transparent;color:#fff;font-weight:800;padding:10px 15px;white-space:nowrap;cursor:pointer;text-decoration:none;font-size:14px}.nav button.active{background:#084d8d}.nav button:focus-visible,.datebox button:focus-visible,.datebox input:focus-visible,.quick button:focus-visible{outline:3px solid #8bc5ff;outline-offset:2px}
-.top-ad{max-width:970px;margin:8px auto 0}.ad-slot{display:flex;align-items:center;justify-content:center;border:1px dashed #c8ced7;background:#f7f8fa;color:#a0a8b3;font-size:11px;text-align:center;overflow:hidden}.ad-top{height:90px}.ad-160x600{width:160px;height:600px}.ad-300x250{width:300px;height:250px}.ad-300x600{width:300px;height:600px}.ad-mobile{display:none;height:100px;margin:8px 0}
+.top-ad{max-width:970px;margin:8px auto 0}.ad-slot{display:flex;align-items:center;justify-content:center;border:1px dashed #c8ced7;background:#f7f8fa;color:#a0a8b3;font-size:11px;text-align:center;overflow:hidden}.ad-top{height:90px}.ad-160x600{width:160px;height:600px}.ad-300x250{width:300px;height:250px}.ad-300x600{width:300px;height:600px}.ad-inline{height:90px;margin:8px 0}.ad-footer{max-width:970px;height:90px;margin:8px auto 12px}.ad-mobile{display:none;height:100px;margin:8px 0}.left-rail .ad-slot{margin-bottom:8px}
 .page{max-width:1240px;margin:0 auto;padding:8px 8px 28px;display:grid;grid-template-columns:170px minmax(0,1fr) 300px;gap:8px;align-items:start}.side{position:sticky;top:8px}.sidebox{background:#fff;border:1px solid var(--line);margin-bottom:8px}.sidebox h2{font-size:13px;margin:0;padding:8px 9px;background:#eef5fc;color:#0b4f91;border-bottom:1px solid #cbdced}.sidebox a{display:block;padding:7px 9px;border-bottom:1px solid #edf0f4;text-decoration:none;font-size:12px;color:#33404e}.sidebox a:last-child{border-bottom:0}.sidebox a:hover{background:#f5f8fb;color:var(--blue)}
 .maincol{min-width:0}.tools{background:#fff;border:1px solid var(--line);padding:8px;margin-bottom:8px}.toolrow{display:flex;align-items:center;justify-content:space-between;gap:8px}.datebox{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.datebox button,.datebox input{height:34px;border:1px solid #c9d0d9;background:#fff;border-radius:4px;padding:0 9px;font-weight:700;font-size:12px}.datebox button{cursor:pointer}.datebox button:disabled{opacity:.45;cursor:not-allowed}.datebox .today{background:var(--blue);color:#fff;border-color:var(--blue)}.status{font-size:11px;color:#66717f;white-space:nowrap}.history{margin-top:6px;display:flex;align-items:center;gap:6px}.historyLabel{font-size:11px;color:#687483;font-weight:700;white-space:nowrap}.quick{display:flex;gap:4px;overflow:auto;padding-bottom:1px}.quick button{border:1px solid #ccd3dc;background:#fff;border-radius:4px;padding:5px 7px;font-weight:700;cursor:pointer;color:#36404c;font-size:11px;white-space:nowrap}.quick button.active{background:#eef5fc;border-color:#8ebbe6;color:#075baa}
 .titlebar{background:#fff;border:1px solid var(--line);border-bottom:3px solid var(--blue);padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px;align-items:center}.titlebar h1{font-size:17px;margin:0;color:#1e2937}.titlebar p{margin:3px 0 0;color:#6a7481;font-size:11px}.verified{display:inline-flex;align-items:center;gap:4px;border:1px solid #b7dec1;background:#f0fbf3;color:var(--green);font-size:10px;font-weight:800;padding:4px 7px;border-radius:999px;white-space:nowrap}
@@ -51,7 +51,8 @@
     <a href="./?region=north">Kết quả Miền Bắc</a>
     <a href="./tinh/">Kết quả theo tỉnh</a>
   </div>
-  <div class="ad-slot ad-160x600" data-ad-slot="left-160x600">Quảng cáo 160×600</div>
+  <div class="ad-slot ad-160x600" data-ad-slot="left-top-160x600">Quảng cáo trái A 160×600</div>
+  <div class="ad-slot ad-160x600" data-ad-slot="left-bottom-160x600">Quảng cáo trái B 160×600</div>
 </aside>
 
 <main class="maincol">
@@ -71,6 +72,8 @@
   </div>
 </section>
 
+<div class="ad-slot ad-inline" data-ad-slot="content-top-728x90">Quảng cáo nội dung A 728×90 / responsive</div>
+
 <section class="titlebar">
   <div><h1 id="pageTitle">KẾT QUẢ XỔ SỐ MIỀN NAM</h1><p id="dateTitle">Đang tải dữ liệu đã xác thực…</p></div>
   <span class="verified">✓ ĐÃ XÁC THỰC</span>
@@ -78,13 +81,18 @@
 
 <div class="ad-slot ad-mobile" data-ad-slot="mobile-320x100">Vị trí quảng cáo mobile 320×100</div>
 <section id="results" aria-live="polite"><div class="empty"><strong>Đang tải kết quả…</strong>Đang kết nối nguồn dữ liệu xác thực.</div></section>
+<div class="ad-slot ad-inline" data-ad-slot="content-bottom-728x90">Quảng cáo nội dung B 728×90 / responsive</div>
+<div class="ad-slot ad-mobile" data-ad-slot="mobile-bottom-320x100">Quảng cáo mobile B 320×100</div>
 </main>
 
 <aside class="side right-rail" aria-label="Khu vực quảng cáo">
-  <div class="ad-slot ad-300x250" data-ad-slot="right-top-300x250">Quảng cáo 300×250</div>
-  <div class="ad-slot ad-300x600" data-ad-slot="right-300x600">Quảng cáo 300×600</div>
+  <div class="ad-slot ad-300x250" data-ad-slot="right-top-300x250">Quảng cáo phải A 300×250</div>
+  <div class="ad-slot ad-300x600" data-ad-slot="right-middle-300x600">Quảng cáo phải B 300×600</div>
+  <div class="ad-slot ad-300x250" data-ad-slot="right-bottom-300x250">Quảng cáo phải C 300×250</div>
 </aside>
 </div>
+
+<div class="ad-slot ad-footer" data-ad-slot="footer-970x90">Quảng cáo cuối trang 970×90</div>
 
 <footer class="footer">Xoso88 chỉ hiển thị kết quả đã qua kiểm tra và xuất bản. Có thể đối chiếu nguồn ngay trong bảng. Không có dữ liệu thật thì không hiển thị số giả. • <a href="./tinh/">Tra cứu theo tỉnh</a></footer>
 
