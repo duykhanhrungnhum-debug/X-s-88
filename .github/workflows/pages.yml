@@ -67,8 +67,10 @@ jobs:
         run: |
           for i in 1 2 3 4 5 6; do
             html="$(curl -fsSL "https://duykhanhrungnhum-debug.github.io/X-s-88/?v=${GITHUB_SHA}" || true)"
-            if printf '%s' "$html" | grep -q "supabase.co/rest/v1"; then
-              echo "Pages OK: latest REST frontend is live"
+            if printf '%s' "$html" | grep -q "supabase.co/rest/v1" \
+              && printf '%s' "$html" | grep -q 'data-ad-slot="right-top-300x250"' \
+              && printf '%s' "$html" | grep -q 'renderResults(draws)'; then
+              echo "Pages OK: compact results + advertising rails are live"
               exit 0
             fi
             sleep 5
