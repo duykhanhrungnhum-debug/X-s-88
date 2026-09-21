@@ -28,10 +28,22 @@ def test_homepage_has_search_and_accessibility_basics():
     assert len(soup.select("[data-region]")) == 3
     assert soup.select_one('[aria-live="polite"]')
     assert soup.select_one(".result-table") is None  # rendered from verified API data
-    assert soup.select_one('[data-ad-slot="top-970x90"]')
-    assert soup.select_one('[data-ad-slot="right-top-300x250"]')
-    assert soup.select_one('[data-ad-slot="right-300x600"]')
-    assert soup.select_one('[data-ad-slot="mobile-320x100"]')
+    slots = {node.get("data-ad-slot") for node in soup.select("[data-ad-slot]")}
+    expected_slots = {
+        "top-970x90",
+        "left-top-160x600",
+        "left-bottom-160x600",
+        "content-top-728x90",
+        "mobile-320x100",
+        "content-bottom-728x90",
+        "mobile-bottom-320x100",
+        "right-top-300x250",
+        "right-middle-300x600",
+        "right-bottom-300x250",
+        "footer-970x90",
+    }
+    assert expected_slots <= slots
+    assert len(slots) >= 11
     assert "renderResults(draws)" in html
 
 
